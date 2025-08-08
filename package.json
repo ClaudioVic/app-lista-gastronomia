@@ -1,6 +1,7 @@
 {
   "name": "lista_ingredientes",
   "version": "0.1.0",
+  "homepage": "https://claudiovic.github.io/app-lista-gastronomia/"
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.14.0",
