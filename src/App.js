@@ -529,12 +529,15 @@ const IngredientsScreen = ({ profileData, setProfileData }) => {
         const ingredients = (aula.ingredients || []).filter(ing => ing.name && ing.quantity && ing.unit).map(ing => ({ name: ing.name, quantity: ing.quantity, unit: ing.unit, obs: ing.obs || "" }));
         const date = aula.date ? new Date(aula.date).toLocaleDateString('pt-BR', {timeZone: 'UTC'}) : 'Sem data';
         const fileName = `Lista_${discipline.name}_${aula.name}.pdf`;
+        
         Promise.all([
             loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'),
-            loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js')
+            // CORREÇÃO: Usando uma versão do plugin autotable conhecida por ser estável com carregamento de script
+            loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js')
         ]).then(() => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            
             doc.setFontSize(16);
             doc.text(`Lista de Ingredientes`, 14, 22);
             doc.setFontSize(11);
@@ -542,9 +545,18 @@ const IngredientsScreen = ({ profileData, setProfileData }) => {
             doc.text(`Professor(a): ${profileData.professorName}`, 14, 32);
             doc.text(`Disciplina: ${discipline.name}`, 14, 38);
             doc.text(`Aula: ${aula.name} - Data: ${date}`, 14, 44);
+
             const tableColumn = ["Nome do Ingrediente", "Quantidade", "Unid.", "Observações"];
             const tableRows = ingredients.map(ing => [ing.name, ing.quantity, ing.unit, ing.obs]);
-            doc.autoTable({ head: [tableColumn], body: tableRows, startY: 55, theme: 'grid' });
+
+            // A chamada doc.autoTable() agora deve funcionar corretamente
+            doc.autoTable({
+                head: [tableColumn],
+                body: tableRows,
+                startY: 55,
+                theme: 'grid',
+            });
+
             doc.save(fileName);
         }).catch(error => console.error("Falha ao carregar scripts do PDF:", error));
     };
